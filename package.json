@@ -2,12 +2,15 @@
   "name": "claude-code-transcripts",
   "version": "1.0.0",
   "description": "Convert Claude Code session JSON to clean mobile-friendly HTML pages with pagination",
-  "repository": "https://github.com/johncmunson/claude-code-transcripts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/johncmunson/claude-code-transcripts.git"
+  },
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
-    "claude-code-transcripts": "./dist/cli.js"
+    "claude-code-transcripts": "dist/cli.js"
   },
   "files": [
     "dist"
