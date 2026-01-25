@@ -6,6 +6,8 @@ Convert Claude Code session files (JSON or JSONL) to clean, mobile-friendly HTML
 
 Read [A new way to extract detailed transcripts from Claude Code](https://simonwillison.net/2025/Dec/25/claude-code-transcripts/) for background on this project.
 
+> Note: This is a pure TypeScript port of `claude-code-transcripts`, originally written in Python by Simon Willison.
+
 ## Installation
 
 Install with npm:
