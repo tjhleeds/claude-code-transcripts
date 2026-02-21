@@ -10,7 +10,8 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
-    "claude-code-transcripts": "dist/cli.js"
+    "claude-code-transcripts": "dist/cli.js",
+    "cct": "dist/cli.js"
   },
   "files": [
     "dist"

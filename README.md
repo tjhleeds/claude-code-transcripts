@@ -17,8 +17,10 @@ npm install -g claude-code-transcripts
 
 Or run directly with npx:
 ```bash
-npx claude-code-transcripts --help
+npx cct --help
 ```
+
+You can use `cct` or `claude-code-transcripts` — both work the same.
 
 ## Usage
 
@@ -33,7 +35,7 @@ There are three commands available:
 The quickest way to view a recent local session:
 
 ```bash
-claude-code-transcripts
+cct
 ```
 
 This shows an interactive picker to select a session, generates HTML, and opens it in your default browser.
@@ -58,15 +60,15 @@ The generated output includes:
 Local Claude Code sessions are stored as JSONL files in `~/.claude/projects`. Run with no arguments to select from recent sessions:
 
 ```bash
-claude-code-transcripts
+cct
 # or explicitly:
-claude-code-transcripts local
+cct local
 ```
 
 Use `--limit` to control how many sessions are shown (default: 10):
 
 ```bash
-claude-code-transcripts local --limit 20
+cct local --limit 20
 ```
 
 ### Publishing to GitHub Gist
@@ -74,8 +76,8 @@ claude-code-transcripts local --limit 20
 Use the `--gist` option to automatically upload your transcript to a GitHub Gist and get a shareable preview URL:
 
 ```bash
-claude-code-transcripts --gist
-claude-code-transcripts json session.json --gist
+cct --gist
+cct json session.json --gist
 ```
 
 This will output something like:
@@ -90,7 +92,7 @@ The preview URL uses [gisthost.github.io](https://gisthost.github.io/) to render
 Combine with `-o` to keep a local copy:
 
 ```bash
-claude-code-transcripts json session.json -o ./my-transcript --gist
+cct json session.json -o ./my-transcript --gist
 ```
 
 **Requirements:** The `--gist` option requires the [GitHub CLI](https://cli.github.com/) (`gh`) to be installed and authenticated (`gh auth login`).
@@ -101,10 +103,10 @@ Use `-a/--output-auto` to automatically create a subdirectory named after the se
 
 ```bash
 # Creates ./session_ABC123/ subdirectory
-claude-code-transcripts json session_ABC123.json -a
+cct json session_ABC123.json -a
 
 # Creates ./transcripts/session_ABC123/ subdirectory
-claude-code-transcripts json session.json -o ./transcripts -a
+cct json session.json -o ./transcripts -a
 ```
 
 ### Including the source file
@@ -112,7 +114,7 @@ claude-code-transcripts json session.json -o ./transcripts -a
 Use the `--json` option to include the original session file in the output directory:
 
 ```bash
-claude-code-transcripts json session.json -o ./my-transcript --json
+cct json session.json -o ./my-transcript --json
 ```
 
 This is useful for archiving the source data alongside the HTML output.
@@ -122,8 +124,8 @@ This is useful for archiving the source data alongside the HTML output.
 Convert a specific session file directly:
 
 ```bash
-claude-code-transcripts json session.json -o output-directory/
-claude-code-transcripts json session.jsonl --open
+cct json session.json -o output-directory/
+cct json session.jsonl --open
 ```
 
 This works with both JSONL files in the `~/.claude/projects/` folder and JSON session files.
@@ -131,7 +133,7 @@ This works with both JSONL files in the `~/.claude/projects/` folder and JSON se
 The `json` command can take a URL to a JSON or JSONL file as an alternative to a path on disk:
 
 ```bash
-claude-code-transcripts json https://example.com/session.jsonl --open
+cct json https://example.com/session.jsonl --open
 ```
 
 ### Converting all sessions
@@ -139,7 +141,7 @@ claude-code-transcripts json https://example.com/session.jsonl --open
 Convert all your local Claude Code sessions to a browsable HTML archive:
 
 ```bash
-claude-code-transcripts all
+cct all
 ```
 
 This creates a directory structure with:
@@ -160,16 +162,16 @@ Examples:
 
 ```bash
 # Preview what would be converted
-claude-code-transcripts all --dry-run
+cct all --dry-run
 
 # Convert all sessions and open in browser
-claude-code-transcripts all --open
+cct all --open
 
 # Convert to a specific directory
-claude-code-transcripts all -o ./my-archive
+cct all -o ./my-archive
 
 # Include agent sessions
-claude-code-transcripts all --include-agents
+cct all --include-agents
 ```
 
 ## Features
