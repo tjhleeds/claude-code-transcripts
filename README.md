@@ -1,4 +1,4 @@
-# claude-code-transcripts
+# claude-code-transcripts - `cct`
 
 Convert Claude Code session files (JSON or JSONL) to clean, mobile-friendly HTML pages with pagination.
 
