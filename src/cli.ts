@@ -7,6 +7,10 @@ import { program } from 'commander'
 import * as fs from 'node:fs'
 import * as path from 'node:path'
 import * as os from 'node:os'
+
+import pkg from '../package.json' with { type: 'json' }
+
+const { version } = pkg
 import { execSync, spawn } from 'node:child_process'
 import Enquirer from 'enquirer'
 
@@ -124,7 +128,7 @@ function formatDate(date: Date): string {
 program
   .name('claude-code-transcripts')
   .description('Convert Claude Code session JSON to mobile-friendly HTML pages')
-  .version('1.0.0')
+  .version(version)
 
 // Local command (default)
 program
