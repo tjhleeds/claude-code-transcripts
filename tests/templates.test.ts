@@ -28,7 +28,6 @@ import {
   indexTemplate,
   projectIndexTemplate,
   masterIndexTemplate,
-  injectGistPreviewJs,
 } from '../src/templates.js'
 
 describe('escapeHtml', () => {
@@ -298,22 +297,5 @@ describe('masterIndexTemplate', () => {
     expect(result).toContain('project-b')
     expect(result).toContain('5 sessions')
     expect(result).toContain('3 sessions')
-  })
-})
-
-describe('injectGistPreviewJs', () => {
-  it('injects script before closing body', () => {
-    const html = '<html><body><p>content</p></body></html>'
-    const result = injectGistPreviewJs(html)
-
-    expect(result).toContain('<script>')
-    expect(result).toContain('gisthost.github.io')
-    expect(result).toContain('</body>')
-  })
-
-  it('returns unchanged if no body tag', () => {
-    const html = '<p>no body tag</p>'
-    const result = injectGistPreviewJs(html)
-    expect(result).toBe(html)
   })
 })

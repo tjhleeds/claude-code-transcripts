@@ -29,7 +29,7 @@ This tool converts Claude Code session files into browseable multi-page HTML tra
 There are three commands available:
 
 - `local` (default) - select from local Claude Code sessions stored in `~/.claude/projects`
-- `json` - convert a specific JSON or JSONL session file (or URL)
+- `json` - convert a specific JSON or JSONL session file
 - `all` - convert all local sessions to a browsable HTML archive
 
 The quickest way to view a recent local session:
@@ -48,7 +48,6 @@ All commands support these options:
 - `-a, --output-auto` - auto-name output subdirectory based on session ID or filename
 - `--repo <owner/name>` - GitHub repo for commit links (auto-detected from git push output if not specified)
 - `--open` - open the generated `index.html` in your default browser (default if no `-o` specified)
-- `--gist` - upload the generated HTML files to a GitHub Gist and output a preview URL
 - `--json` - include the original session file in the output directory
 
 The generated output includes:
@@ -78,32 +77,6 @@ cct <sessionId>
 # or explicitly:
 cct local <sessionId>
 ```
-
-### Publishing to GitHub Gist
-
-Use the `--gist` option to automatically upload your transcript to a GitHub Gist and get a shareable preview URL:
-
-```bash
-cct --gist
-cct json session.json --gist
-```
-
-This will output something like:
-```
-Gist: https://gist.github.com/username/abc123def456
-Preview: https://gisthost.github.io/?abc123def456/index.html
-Files: /var/folders/.../session-id
-```
-
-The preview URL uses [gisthost.github.io](https://gisthost.github.io/) to render your HTML gist. The tool automatically injects JavaScript to fix relative links when served through gisthost.
-
-Combine with `-o` to keep a local copy:
-
-```bash
-cct json session.json -o ./my-transcript --gist
-```
-
-**Requirements:** The `--gist` option requires the [GitHub CLI](https://cli.github.com/) (`gh`) to be installed and authenticated (`gh auth login`).
 
 ### Auto-naming output directories
 
@@ -137,12 +110,6 @@ cct json session.jsonl --open
 ```
 
 This works with both JSONL files in the `~/.claude/projects/` folder and JSON session files.
-
-The `json` command can take a URL to a JSON or JSONL file as an alternative to a path on disk:
-
-```bash
-cct json https://example.com/session.jsonl --open
-```
 
 ### Converting all sessions
 
@@ -193,7 +160,6 @@ cct all --include-agents
 - **Content Truncation**: Long content can be expanded/collapsed
 - **Interactive Timestamps**: Shows relative times in browser
 - **Batch Processing**: Convert entire session archives with progress tracking
-- **GitHub Gist Publishing**: One-command publishing with preview URLs
 - **Image Embedding**: Embedded image support in tool results
 - **Thinking Blocks**: Collapsible AI thinking visualization
 - **Tool Display**: Custom rendering for Bash, Write, Edit, and TodoWrite tools

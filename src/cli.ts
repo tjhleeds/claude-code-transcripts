@@ -11,7 +11,7 @@ import * as os from 'node:os'
 import pkg from '../package.json' with { type: 'json' }
 
 const { version } = pkg
-import { execSync, spawn } from 'node:child_process'
+import { spawn } from 'node:child_process'
 import Enquirer from 'enquirer'
 
 import {
@@ -25,76 +25,9 @@ import {
 import {
   generateHtml,
   generateBatchHtml,
-  injectGistPreviewJsToDir,
 } from './renderer.js'
 
 const enquirer = new Enquirer()
-
-/**
- * Check if a path is a URL
- */
-function isUrl(pathStr: string): boolean {
-  return pathStr.startsWith('http://') || pathStr.startsWith('https://')
-}
-
-/**
- * Fetch a URL and save to a temporary file
- */
-async function fetchUrlToTempfile(url: string): Promise<string> {
-  const response = await fetch(url, { redirect: 'follow' })
-  if (!response.ok) {
-    throw new Error(`Failed to fetch URL: ${response.status} ${response.statusText}`)
-  }
-
-  const text = await response.text()
-
-  // Determine file extension from URL
-  const urlPath = url.split('?')[0]
-  let suffix = '.jsonl'
-  if (urlPath.endsWith('.json')) {
-    suffix = '.json'
-  }
-
-  // Extract name from URL
-  const urlName = path.basename(urlPath, suffix) || 'session'
-
-  const tempDir = os.tmpdir()
-  const tempFile = path.join(tempDir, `claude-url-${urlName}${suffix}`)
-  fs.writeFileSync(tempFile, text, 'utf-8')
-
-  return tempFile
-}
-
-/**
- * Create a GitHub gist from HTML files
- */
-function createGist(outputDir: string, isPublic = false): { gistId: string; gistUrl: string } {
-  const htmlFiles = fs.readdirSync(outputDir)
-    .filter(f => f.endsWith('.html'))
-    .map(f => path.join(outputDir, f))
-    .sort()
-
-  if (htmlFiles.length === 0) {
-    throw new Error('No HTML files found to upload to gist.')
-  }
-
-  const args = ['gist', 'create', ...htmlFiles]
-  if (isPublic) {
-    args.push('--public')
-  }
-
-  try {
-    const result = execSync(`gh ${args.join(' ')}`, { encoding: 'utf-8' }).trim()
-    // Output is the gist URL
-    const gistUrl = result
-    const gistId = gistUrl.split('/').pop() || ''
-    return { gistId, gistUrl }
-  } catch (e) {
-    const error = e as Error & { stderr?: string }
-    const errorMsg = error.stderr || error.message
-    throw new Error(`Failed to create gist: ${errorMsg}`)
-  }
-}
 
 /**
  * Open a URL in the default browser
@@ -138,7 +71,6 @@ program
   .option('-o, --output <dir>', 'Output directory')
   .option('-a, --output-auto', 'Auto-name output subdirectory based on session filename')
   .option('--repo <repo>', 'GitHub repo (owner/name) for commit links')
-  .option('--gist', 'Upload to GitHub Gist')
   .option('--json', 'Include the original JSONL session file in output')
   .option('--open', 'Open in browser')
   .option('--limit <n>', 'Maximum sessions to show', '10')
@@ -201,7 +133,7 @@ program
     const sessionStem = path.basename(sessionFile, path.extname(sessionFile))
 
     // Determine output directory
-    const autoOpen = !options.output && !options.gist && !options.outputAuto
+    const autoOpen = !options.output && !options.outputAuto
     let outputDir: string
 
     if (options.outputAuto) {
@@ -225,15 +157,6 @@ program
       console.log(`JSONL: ${jsonDest} (${jsonSizeKb.toFixed(1)} KB)`)
     }
 
-    if (options.gist) {
-      injectGistPreviewJsToDir(outputDir)
-      console.log('Creating GitHub gist...')
-      const { gistId, gistUrl } = createGist(outputDir)
-      const previewUrl = `https://gisthost.github.io/?${gistId}/index.html`
-      console.log(`Gist: ${gistUrl}`)
-      console.log(`Preview: ${previewUrl}`)
-    }
-
     if (options.open || autoOpen) {
       const indexUrl = `file://${path.resolve(outputDir, 'index.html')}`
       openBrowser(indexUrl)
@@ -243,39 +166,23 @@ program
 // JSON command
 program
   .command('json <file>')
-  .description('Convert a Claude Code session JSON/JSONL file or URL to HTML')
+  .description('Convert a Claude Code session JSON/JSONL file to HTML')
   .option('-o, --output <dir>', 'Output directory')
   .option('-a, --output-auto', 'Auto-name output subdirectory based on filename')
   .option('--repo <repo>', 'GitHub repo (owner/name) for commit links')
-  .option('--gist', 'Upload to GitHub Gist')
   .option('--json', 'Include the original JSON file in output')
   .option('--open', 'Open in browser')
   .action(async (file, options) => {
-    let jsonFilePath: string
-    let urlName: string | null = null
-
-    // Handle URL input
-    if (isUrl(file)) {
-      console.log(`Fetching ${file}...`)
-      try {
-        jsonFilePath = await fetchUrlToTempfile(file)
-        urlName = path.basename(file.split('?')[0], path.extname(file.split('?')[0])) || 'session'
-      } catch (e) {
-        console.error(`Error: ${(e as Error).message}`)
-        process.exit(1)
-      }
-    } else {
-      jsonFilePath = file
-      if (!fs.existsSync(jsonFilePath)) {
-        console.error(`Error: File not found: ${file}`)
-        process.exit(1)
-      }
+    const jsonFilePath: string = file
+    if (!fs.existsSync(jsonFilePath)) {
+      console.error(`Error: File not found: ${file}`)
+      process.exit(1)
     }
 
-    const fileStem = urlName || path.basename(jsonFilePath, path.extname(jsonFilePath))
+    const fileStem = path.basename(jsonFilePath, path.extname(jsonFilePath))
 
     // Determine output directory
-    const autoOpen = !options.output && !options.gist && !options.outputAuto
+    const autoOpen = !options.output && !options.outputAuto
     let outputDir: string
 
     if (options.outputAuto) {
@@ -297,15 +204,6 @@ program
       fs.copyFileSync(jsonFilePath, jsonDest)
       const jsonSizeKb = fs.statSync(jsonDest).size / 1024
       console.log(`JSON: ${jsonDest} (${jsonSizeKb.toFixed(1)} KB)`)
-    }
-
-    if (options.gist) {
-      injectGistPreviewJsToDir(outputDir)
-      console.log('Creating GitHub gist...')
-      const { gistId, gistUrl } = createGist(outputDir)
-      const previewUrl = `https://gisthost.github.io/?${gistId}/index.html`
-      console.log(`Gist: ${gistUrl}`)
-      console.log(`Preview: ${previewUrl}`)
     }
 
     if (options.open || autoOpen) {

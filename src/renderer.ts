@@ -30,7 +30,6 @@ import {
   indexTemplate,
   projectIndexTemplate,
   masterIndexTemplate,
-  injectGistPreviewJs,
   type TodoItem,
   type SessionData as TemplateSessionData,
   type ProjectData,
@@ -806,20 +805,6 @@ function generateMasterIndex(projects: ProjectInfo[], outputDir: string): void {
   const htmlContent = masterIndexTemplate(projectsData, projects.length, totalSessions)
   const outputPath = path.join(outputDir, 'index.html')
   fs.writeFileSync(outputPath, htmlContent, 'utf-8')
-}
-
-/**
- * Inject gist preview JS into all HTML files in output directory
- */
-export function injectGistPreviewJsToDir(outputDir: string): void {
-  const htmlFiles = fs.readdirSync(outputDir).filter((f) => f.endsWith('.html'))
-
-  for (const htmlFile of htmlFiles) {
-    const filePath = path.join(outputDir, htmlFile)
-    let content = fs.readFileSync(filePath, 'utf-8')
-    content = injectGistPreviewJs(content)
-    fs.writeFileSync(filePath, content, 'utf-8')
-  }
 }
 
 /**

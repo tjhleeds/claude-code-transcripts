@@ -44,7 +44,6 @@ export {
   generateHtml,
   generateBatchHtml,
   generateHtmlFromSessionData,
-  injectGistPreviewJsToDir,
   PROMPTS_PER_PAGE,
   LONG_TEXT_THRESHOLD,
   type ConversationStats,
@@ -78,7 +77,6 @@ export {
   indexTemplate,
   projectIndexTemplate,
   masterIndexTemplate,
-  injectGistPreviewJs,
   type TodoItem,
   type SessionData as TemplateSessionData,
   type ProjectData,
@@ -86,4 +84,4 @@ export {
 
 // Re-export CSS and JS constants
 export { CSS } from './css.js'
-export { JS, GIST_PREVIEW_JS } from './js.js'
+export { JS } from './js.js'
