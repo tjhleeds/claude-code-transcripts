@@ -339,6 +339,39 @@ export function findLocalSessions(folder: string, limit = 10): Array<{ path: str
 }
 
 /**
+ * Find a session file by its ID (the JSONL filename without extension) anywhere in the given folder.
+ */
+export function findSessionById(folder: string, sessionId: string): string | null {
+  if (!fs.existsSync(folder)) {
+    return null
+  }
+
+  const targetName = `${sessionId.replace(/\.jsonl$/, '')}.jsonl`
+
+  // Recursively search for the matching .jsonl file
+  function walkDir(dir: string): string | null {
+    const entries = fs.readdirSync(dir, { withFileTypes: true })
+
+    for (const entry of entries) {
+      const fullPath = path.join(dir, entry.name)
+
+      if (entry.isDirectory()) {
+        const found = walkDir(fullPath)
+        if (found) {
+          return found
+        }
+      } else if (entry.isFile() && entry.name === targetName) {
+        return fullPath
+      }
+    }
+
+    return null
+  }
+
+  return walkDir(folder)
+}
+
+/**
  * Find all sessions in a Claude projects folder, grouped by project.
  */
 export function findAllSessions(folder: string, includeAgents = false): ProjectInfo[] {

@@ -13,6 +13,7 @@ import {
   parseSessionFile,
   getProjectDisplayName,
   findLocalSessions,
+  findSessionById,
   findAllSessions,
   detectGithubRepo,
 } from '../src/parser.js'
@@ -244,6 +245,49 @@ describe('findAllSessions', () => {
       expect(session.summary).toBeDefined()
       expect(session.summary).not.toBe('(no summary)')
     }
+  })
+})
+
+describe('findSessionById', () => {
+  let tempDir: string
+
+  beforeEach(() => {
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'test-find-session-'))
+
+    const projectA = path.join(tempDir, '-home-user-projects-project-a')
+    fs.mkdirSync(projectA, { recursive: true })
+    fs.writeFileSync(path.join(projectA, 'abc123.jsonl'), '')
+
+    const nestedB = path.join(tempDir, '-home-user-projects-project-b', 'nested')
+    fs.mkdirSync(nestedB, { recursive: true })
+    fs.writeFileSync(path.join(nestedB, 'def456.jsonl'), '')
+  })
+
+  afterEach(() => {
+    fs.rmSync(tempDir, { recursive: true, force: true })
+  })
+
+  it('finds a session in any project folder', () => {
+    expect(findSessionById(tempDir, 'abc123')).toBe(
+      path.join(tempDir, '-home-user-projects-project-a', 'abc123.jsonl')
+    )
+    expect(findSessionById(tempDir, 'def456')).toBe(
+      path.join(tempDir, '-home-user-projects-project-b', 'nested', 'def456.jsonl')
+    )
+  })
+
+  it('accepts an ID with a .jsonl extension', () => {
+    expect(findSessionById(tempDir, 'abc123.jsonl')).toBe(
+      path.join(tempDir, '-home-user-projects-project-a', 'abc123.jsonl')
+    )
+  })
+
+  it('returns null for an unknown ID', () => {
+    expect(findSessionById(tempDir, 'missing')).toBeNull()
+  })
+
+  it('returns null for nonexistent folder', () => {
+    expect(findSessionById('/nonexistent/path', 'abc123')).toBeNull()
   })
 })
 

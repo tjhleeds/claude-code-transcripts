@@ -71,6 +71,14 @@ Use `--limit` to control how many sessions are shown (default: 10):
 cct local --limit 20
 ```
 
+To skip the picker and convert a specific session, pass its session ID (the `.jsonl` filename without the extension). This searches all projects, not just the recent sessions:
+
+```bash
+cct <sessionId>
+# or explicitly:
+cct local <sessionId>
+```
+
 ### Publishing to GitHub Gist
 
 Use the `--gist` option to automatically upload your transcript to a GitHub Gist and get a shareable preview URL:

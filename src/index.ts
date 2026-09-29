@@ -10,6 +10,7 @@ export {
   parseSessionFile,
   getProjectDisplayName,
   findLocalSessions,
+  findSessionById,
   findAllSessions,
   detectGithubRepo,
   getDefaultProjectsFolder,

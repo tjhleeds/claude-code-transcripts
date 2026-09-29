@@ -16,6 +16,7 @@ import Enquirer from 'enquirer'
 
 import {
   findLocalSessions,
+  findSessionById,
   findAllSessions,
   getSessionSummary,
   getDefaultProjectsFolder,
@@ -132,8 +133,8 @@ program
 
 // Local command (default)
 program
-  .command('local', { isDefault: true })
-  .description('Select and convert a local Claude Code session to HTML')
+  .command('local [sessionId]', { isDefault: true })
+  .description('Select and convert a local Claude Code session to HTML (or pass a session ID to skip selection)')
   .option('-o, --output <dir>', 'Output directory')
   .option('-a, --output-auto', 'Auto-name output subdirectory based on session filename')
   .option('--repo <repo>', 'GitHub repo (owner/name) for commit links')
@@ -141,7 +142,7 @@ program
   .option('--json', 'Include the original JSONL session file in output')
   .option('--open', 'Open in browser')
   .option('--limit <n>', 'Maximum sessions to show', '10')
-  .action(async (options) => {
+  .action(async (sessionId: string | undefined, options) => {
     const projectsFolder = getDefaultProjectsFolder()
 
     if (!fs.existsSync(projectsFolder)) {
@@ -150,43 +151,53 @@ program
       return
     }
 
-    console.log('Loading local sessions...')
-    const results = findLocalSessions(projectsFolder, parseInt(options.limit))
+    let sessionFile: string
 
-    if (results.length === 0) {
-      console.log('No local sessions found.')
-      return
-    }
-
-    // Build choices for selection
-    const choices = results.map(({ path: filepath, summary }) => {
-      const stat = fs.statSync(filepath)
-      const modTime = new Date(stat.mtimeMs)
-      const sizeKb = stat.size / 1024
-      const dateStr = formatDate(modTime)
-      const truncatedSummary = summary.length > 50 ? summary.slice(0, 47) + '...' : summary
-      return {
-        name: filepath,
-        message: `${dateStr}  ${sizeKb.toFixed(0).padStart(5)} KB  ${truncatedSummary}`,
+    if (sessionId) {
+      const found = findSessionById(projectsFolder, sessionId)
+      if (!found) {
+        console.error(`Error: Session not found: ${sessionId}`)
+        process.exit(1)
       }
-    })
+      sessionFile = found
+    } else {
+      console.log('Loading local sessions...')
+      const results = findLocalSessions(projectsFolder, parseInt(options.limit))
 
-    let response: { session: string }
-    try {
-      response = await enquirer.prompt({
-        type: 'select',
-        name: 'session',
-        message: 'Select a session to convert:',
-        choices,
-      }) as { session: string }
-    } catch {
-      console.log('No session selected.')
-      return
+      if (results.length === 0) {
+        console.log('No local sessions found.')
+        return
+      }
+
+      // Build choices for selection
+      const choices = results.map(({ path: filepath, summary }) => {
+        const stat = fs.statSync(filepath)
+        const modTime = new Date(stat.mtimeMs)
+        const sizeKb = stat.size / 1024
+        const dateStr = formatDate(modTime)
+        const truncatedSummary = summary.length > 50 ? summary.slice(0, 47) + '...' : summary
+        return {
+          name: filepath,
+          message: `${dateStr}  ${sizeKb.toFixed(0).padStart(5)} KB  ${truncatedSummary}`,
+        }
+      })
+
+      let response: { session: string }
+      try {
+        response = await enquirer.prompt({
+          type: 'select',
+          name: 'session',
+          message: 'Select a session to convert:',
+          choices,
+        }) as { session: string }
+      } catch {
+        console.log('No session selected.')
+        return
+      }
+
+      sessionFile = response.session
     }
 
-    const selected = response.session
-
-    const sessionFile = selected
     const sessionStem = path.basename(sessionFile, path.extname(sessionFile))
 
     // Determine output directory
