@@ -254,6 +254,14 @@ export function commitCard(
 }
 
 /**
+ * Copy-to-clipboard button - copies the text of the element matching `targetSelector`
+ * within the nearest ancestor matching `rootSelector`
+ */
+export function copyButton(rootSelector: string, targetSelector: string): string {
+  return `<button type="button" class="copy-btn" data-copy-root="${escapeHtml(rootSelector)}" data-copy-target="${escapeHtml(targetSelector)}" title="Copy to clipboard" aria-label="Copy to clipboard"><svg class="copy-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg><svg class="check-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg></button>`
+}
+
+/**
  * Message wrapper - contentHtml is pre-rendered
  */
 export function message(
@@ -263,7 +271,7 @@ export function message(
   timestamp: string,
   contentHtml: string
 ): string {
-  return `<div class="message ${roleClass}" id="${escapeHtml(msgId)}"><div class="message-header"><span class="role-label">${escapeHtml(roleLabel)}</span><a href="#${escapeHtml(msgId)}" class="timestamp-link"><time datetime="${escapeHtml(timestamp)}" data-timestamp="${escapeHtml(timestamp)}">${escapeHtml(timestamp)}</time></a></div><div class="message-content">${contentHtml}</div></div>`
+  return `<div class="message ${roleClass}" id="${escapeHtml(msgId)}"><div class="message-header"><span class="role-label">${escapeHtml(roleLabel)}</span><span class="header-meta"><a href="#${escapeHtml(msgId)}" class="timestamp-link"><time datetime="${escapeHtml(timestamp)}" data-timestamp="${escapeHtml(timestamp)}">${escapeHtml(timestamp)}</time></a>${copyButton('.message', '.message-content')}</span></div><div class="message-content">${contentHtml}</div></div>`
 }
 
 /**
@@ -276,7 +284,7 @@ export function indexItem(
   renderedContent: string,
   statsHtml: string
 ): string {
-  return `<div class="index-item"><a href="${escapeHtml(link)}"><div class="index-item-header"><span class="index-item-number">#${promptNum}</span><time datetime="${escapeHtml(timestamp)}" data-timestamp="${escapeHtml(timestamp)}">${escapeHtml(timestamp)}</time></div><div class="index-item-content">${renderedContent}</div></a>${statsHtml}</div>`
+  return `<div class="index-item"><a href="${escapeHtml(link)}"><div class="index-item-header"><span class="index-item-number">#${promptNum}</span><span class="header-meta"><time datetime="${escapeHtml(timestamp)}" data-timestamp="${escapeHtml(timestamp)}">${escapeHtml(timestamp)}</time>${copyButton('.index-item', '.index-item-content')}</span></div><div class="index-item-content">${renderedContent}</div></a>${statsHtml}</div>`
 }
 
 /**
@@ -315,7 +323,7 @@ export function indexStats(toolStatsStr: string, longTextsHtml: string): string 
  * Long text in index - renderedContent is pre-rendered markdown
  */
 export function indexLongText(renderedContent: string): string {
-  return `<div class="index-item-long-text"><div class="truncatable"><div class="truncatable-content"><div class="index-item-long-text-content">${renderedContent}</div></div><button class="expand-btn">Show more</button></div></div>`
+  return `<div class="index-item-long-text">${copyButton('.index-item-long-text', '.index-item-long-text-content')}<div class="truncatable"><div class="truncatable-content"><div class="index-item-long-text-content">${renderedContent}</div></div><button class="expand-btn">Show more</button></div></div>`
 }
 
 /**

@@ -116,6 +116,15 @@ details.continuation[open] summary { border-radius: 12px 12px 0 0; margin-bottom
 .index-item-long-text { margin-top: 8px; padding: 12px; background: var(--card-bg); border-radius: 8px; border-left: 3px solid var(--assistant-border); }
 .index-item-long-text .truncatable.truncated::after { background: linear-gradient(to bottom, transparent, var(--card-bg)); }
 .index-item-long-text-content { color: var(--text-color); }
+.header-meta { display: inline-flex; align-items: center; gap: 6px; }
+.copy-btn { display: inline-flex; align-items: center; justify-content: center; padding: 3px; background: transparent; border: none; border-radius: 4px; color: var(--text-muted); cursor: pointer; line-height: 0; }
+.copy-btn:hover { background: rgba(0,0,0,0.08); color: var(--text-color); }
+.copy-btn .check-icon { display: none; }
+.copy-btn.copied { color: #2e7d32; }
+.copy-btn.copied .copy-icon { display: none; }
+.copy-btn.copied .check-icon { display: inline; }
+.index-item-long-text > .copy-btn { float: right; margin: -6px -6px 4px 8px; position: relative; z-index: 1; }
+.search-result .copy-btn { display: none; }
 #search-box { display: none; align-items: center; gap: 8px; }
 #search-box input { padding: 6px 12px; border: 1px solid var(--assistant-border); border-radius: 6px; font-size: 16px; width: 180px; }
 #search-box button, #modal-search-btn, #modal-close-btn { background: var(--user-border); color: white; border: none; border-radius: 6px; padding: 6px 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; }

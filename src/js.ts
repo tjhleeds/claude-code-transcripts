@@ -27,4 +27,38 @@ document.querySelectorAll('.truncatable').forEach(function(wrapper) {
         });
     }
 });
+function copyRich(html, text) {
+    if (navigator.clipboard && window.isSecureContext && window.ClipboardItem) {
+        return navigator.clipboard.write([new ClipboardItem({
+            'text/html': new Blob([html], { type: 'text/html' }),
+            'text/plain': new Blob([text], { type: 'text/plain' })
+        })]);
+    }
+    return new Promise(function(resolve, reject) {
+        function onCopy(e) {
+            e.clipboardData.setData('text/html', html);
+            e.clipboardData.setData('text/plain', text);
+            e.preventDefault();
+        }
+        document.addEventListener('copy', onCopy);
+        const ok = document.execCommand('copy');
+        document.removeEventListener('copy', onCopy);
+        if (ok) { resolve(); } else { reject(); }
+    });
+}
+document.querySelectorAll('.copy-btn').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const root = btn.closest(btn.getAttribute('data-copy-root'));
+        const target = root && root.querySelector(btn.getAttribute('data-copy-target'));
+        if (!target) return;
+        const clone = target.cloneNode(true);
+        clone.querySelectorAll('.copy-btn, .expand-btn').forEach(function(el) { el.remove(); });
+        copyRich(clone.innerHTML, target.innerText.trim()).then(function() {
+            btn.classList.add('copied');
+            setTimeout(function() { btn.classList.remove('copied'); }, 1500);
+        });
+    });
+});
 `
